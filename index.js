@@ -1,5 +1,5 @@
 import readline from "readline";
-import { askGemini } from "./gemini/geminiClient.js";
+import { streamGemini } from "./gemini/geminiStreamClient.js";
 import { resetContext } from "./utils/chatContext.js";
 
 const rl = readline.createInterface({
@@ -7,26 +7,27 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-console.log(" Gemini Terminal Chat");
+console.log(" Gemini Streaming Chat");
 console.log("Commands: exit | reset\n");
 
 function chat() {
   rl.question("You: ", async (input) => {
     if (input.toLowerCase() === "exit") {
-      console.log(" Bye!");
+      console.log("\n Bye!");
       rl.close();
       return;
     }
 
     if (input.toLowerCase() === "reset") {
       resetContext();
-      console.log("Context cleared\n");
+      console.log(" Context cleared\n");
       chat();
       return;
     }
 
-    const { text } = await askGemini(input);
-    console.log(`\nGemini: ${text}\n`);
+    console.log("\nGemini: ");
+    await streamGemini(input);
+    console.log("\n");
 
     chat();
   });
