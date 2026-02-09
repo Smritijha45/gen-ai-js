@@ -12,7 +12,7 @@ console.log("Type your message. Type 'exit' to quit.\n");
 function askQuestion() {
   rl.question("You: ", async (input) => {
     if (input.toLowerCase() === "exit") {
-      console.log("\n👋 Exiting chat. Bye!");
+      console.log("\n Exiting chat. Bye!");
       rl.close();
       return;
     }
