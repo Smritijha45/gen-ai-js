@@ -1,32 +1,35 @@
 import readline from "readline";
 import { askGemini } from "./gemini/geminiClient.js";
+import { resetContext } from "./utils/chatContext.js";
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 
-console.log("Gemini Terminal Chat");
-console.log("Type your message. Type 'exit' to quit.\n");
+console.log(" Gemini Terminal Chat");
+console.log("Commands: exit | reset\n");
 
-function askQuestion() {
+function chat() {
   rl.question("You: ", async (input) => {
     if (input.toLowerCase() === "exit") {
-      console.log("\n Exiting chat. Bye!");
+      console.log(" Bye!");
       rl.close();
       return;
     }
 
-    try {
-      const { text, responseId } = await askGemini(input);
-      console.log(`\nGemini: ${text}`);
-      console.log(`(response id: ${responseId})\n`);
-    } catch (error) {
-      console.error("Error:", error.message);
+    if (input.toLowerCase() === "reset") {
+      resetContext();
+      console.log("Context cleared\n");
+      chat();
+      return;
     }
 
-    askQuestion();
+    const { text } = await askGemini(input);
+    console.log(`\nGemini: ${text}\n`);
+
+    chat();
   });
 }
 
-askQuestion();
+chat();

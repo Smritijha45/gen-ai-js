@@ -3,29 +3,38 @@ import dotenv from "dotenv";
 import { modelConfig } from "../config/modelConfig.js";
 import { estimateTokens } from "../utils/tokenEstimator.js";
 import { storeResponse } from "../utils/responseStore.js";
+import {
+  addUserMessage,
+  addGeminiMessage,
+  getContextPrompt,
+} from "../utils/chatContext.js";
 
 dotenv.config();
 
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY not found in .env");
-}
-
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 const model = genAI.getGenerativeModel(modelConfig);
 
-export async function askGemini(prompt) {
-  console.log(`\n Estimated input tokens: ${estimateTokens(prompt)}`);
+export async function askGemini(userInput) {
 
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  addUserMessage(userInput);
 
-  console.log(`Estimated output tokens: ${estimateTokens(text)}`);
+ 
+  const promptWithContext = getContextPrompt();
 
-  const responseId = storeResponse(prompt, text);
+  console.log(
+    ` Estimated tokens: ${estimateTokens(promptWithContext)}`
+  );
+
+  const result = await model.generateContent(promptWithContext);
+  const reply = result.response.text();
+
+  addGeminiMessage(reply);
+
+
+  const responseId = storeResponse(userInput, reply);
 
   return {
     responseId,
-    text,
+    text: reply,
   };
 }
