@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Streaming Chat</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #output { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Gemini 2.5 Flash Streaming</h2>
+
+<input id="input" placeholder="Ask something..." size="40" />
+<button onclick="startStream()">Send</button>
+
+<pre id="output"></pre>
+
+<script>
+  function startStream() {
+    const prompt = document.getElementById("input").value;
+    const output = document.getElementById("output");
+    output.textContent = "";
+
+    const eventSource = new EventSource(`/stream?prompt=${encodeURIComponent(prompt)}`);
+
+    eventSource.onmessage = (event) => {
+      if (event.data === "[DONE]") {
+        eventSource.close();
+        return;
+      }
+      output.textContent += event.data;
+    };
+  }
+</script>
+
+</body>
+</html>

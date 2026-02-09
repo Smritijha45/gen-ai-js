@@ -13,14 +13,12 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel(modelConfig);
 
-export async function streamGemini(userInput) {
+export async function streamGeminiToResponse(userInput, res) {
   
   addUserMessage(userInput);
 
-
   const prompt = getContextPrompt();
 
- 
   const stream = await model.generateContentStream(prompt);
 
   let fullResponse = "";
@@ -28,14 +26,14 @@ export async function streamGemini(userInput) {
   for await (const chunk of stream.stream) {
     const text = chunk.text();
     fullResponse += text;
-    process.stdout.write(text); 
-  }
-
-
-  addGeminiMessage(fullResponse);
 
   
+    res.write(`data: ${text}\n\n`);
+  }
+
+  addGeminiMessage(fullResponse);
   storeResponse(userInput, fullResponse);
 
-  return fullResponse;
+  res.write("data: [DONE]\n\n");
+  res.end();
 }
