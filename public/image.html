@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gemini Image Understanding</title>
+</head>
+<body>
+
+<h2>Gemini 2.5 Flash – Image Understanding</h2>
+
+<form id="form">
+  <input type="file" name="image" accept="image/*" required /><br><br>
+  <input type="text" name="prompt" placeholder="Ask about the image (optional)" size="40" /><br><br>
+  <button type="submit">Analyze Image</button>
+</form>
+
+<pre id="output"></pre>
+
+<script>
+  const form = document.getElementById("form");
+  const output = document.getElementById("output");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    output.textContent = "Analyzing...";
+
+    const formData = new FormData(form);
+
+    const res = await fetch("/analyze-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    output.textContent = data.result;
+  });
+</script>
+
+</body>
+</html>
