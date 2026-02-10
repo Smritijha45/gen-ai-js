@@ -1,9 +1,14 @@
 import express from "express";
+import "dotenv/config";
 import path from "path";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import { streamGeminiToResponse } from "./gemini/geminiStreamClient.js";
 import { understandImage } from "./gemini/geminiVisionClient.js";
+
+// ✅ NEW imports
+import { generateImage } from "./gemini/imagenClient.js";
+import { saveBase64Image } from "./utils/saveImage.js";
 
 const app = express();
 const PORT = 3200;
@@ -11,12 +16,13 @@ const PORT = 3200;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
 const upload = multer({ dest: "uploads/" });
+
+/* ---------- EXISTING ROUTES ---------- */
 
 app.get("/stream", async (req, res) => {
   const prompt = req.query.prompt;
@@ -28,20 +34,38 @@ app.get("/stream", async (req, res) => {
   await streamGeminiToResponse(prompt, res);
 });
 
-
 app.post("/analyze-image", upload.single("image"), async (req, res) => {
   try {
     const imagePath = req.file.path;
     const userPrompt = req.body.prompt;
 
     const result = await understandImage(imagePath, userPrompt);
-
     res.json({ result });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+/* ---------- NEW IMAGE GENERATION ROUTE ---------- */
+
+app.post("/generate-image", async (req, res) => {
+  try {
+    const { prompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ error: "Prompt is required" });
+    }
+
+    const base64Image = await generateImage(prompt);
+    const imageUrl = saveBase64Image(base64Image);
+
+    res.json({ success: true, imageUrl });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate image" });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(` Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

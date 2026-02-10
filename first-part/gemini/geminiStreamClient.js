@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
-import { modelConfig } from "../config/modelConfig.js";
+import { modelConfig } from "../first-part/config/modelConfig.js";
 import {
   addUserMessage,
   addGeminiMessage,

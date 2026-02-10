@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>GenAI Image Generator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 30px;
+      background: #0f0f0f;
+      color: white;
+    }
+    input, button {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button {
+      background: #fff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    img {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🎨 Generate Image with GenAI</h2>
+
+  <input
+    id="prompt"
+    placeholder="Describe the image you want..."
+  />
+
+  <button onclick="generateImage()">Generate</button>
+
+  <img id="result" />
+
+  <script>
+    async function generateImage() {
+      const prompt = document.getElementById("prompt").value;
+
+      const res = await fetch("/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt })
+      });
+
+      const data = await res.json();
+      document.getElementById("result").src = data.imageUrl;
+    }
+  </script>
+
+</body>
+</html>
