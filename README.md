@@ -563,6 +563,7 @@ for (const item of storedData) {
 5. What is semantic search?
 
 ---
+![alt text](image.png)
 
 ## 🧠 Intermediate Questions
 
