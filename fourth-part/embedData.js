@@ -1,6 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
-import fs from "fs";
 
 dotenv.config();
 
@@ -8,25 +7,23 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-const texts = JSON.parse(fs.readFileSync("data.json"));
-
-async function embedData() {
+/**
+ * Generates embedding for a single text
+ * @param {string} text
+ * @returns {Promise<number[]>} embedding vector
+ */
+export async function embedData(text) {
   const response = await ai.models.embedContent({
     model: "gemini-embedding-001",
-    contents: texts.map(text => ({
-      role: "user",
-      parts: [{ text }]
-    }))
+    contents: [
+      {
+        role: "user",
+        parts: [{ text }]
+      }
+    ]
   });
 
-  const embeddings = response.embeddings.map((e, i) => ({
-    text: texts[i],
-    embedding: e.values
-  }));
+  const embedding = response.embeddings[0].values;
 
-  fs.writeFileSync("embeddings.json", JSON.stringify(embeddings, null, 2));
-
-  console.log("Embeddings stored successfully ✅");
+  return embedding;
 }
-
-embedData();

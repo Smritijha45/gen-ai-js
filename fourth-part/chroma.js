@@ -1,5 +1,6 @@
 import {CloudClient} from "chromadb";
 import dotenv from "dotenv";
+import { embedData } from "./embedData.js";
 
 dotenv.config();
 
@@ -9,13 +10,33 @@ const client = new CloudClient({
     database: process.env.CHROMA_DATABASE,
 });
 
+// async function main() {
+//     const collection = await client.getOrCreateCollection({
+//         name: "food"
+//     });
+//     collection.add({
+//         ids: ["2"],
+//         documents: ["noodles"],
+//         embeddings: [[0.1, 0.4, 0.3]]
+//     });
+// }
+// main();
 async function main() {
-    await client.createCollection({
-        name: "test_collection2"
-    });
-    await client.createEmbedding({
-        collection: "test_collection2",
-        text: "Hello, world!"
-    });
+  const embedding = await embedData("dog");
+
+  const collection = await client.getOrCreateCollection({
+    name: "animals",
+    embeddingFunction: null
+  });
+
+  await collection.add({
+    ids: ["1"],
+    documents: ["dog"],
+    embeddings: [embedding]
+  });
+
+  
 }
+
 main();
+
