@@ -410,3 +410,243 @@ Bridge between human language and ML math.
 
 ---
 
+# 🧠 Semantic Search & Embeddings – Complete Notes
+
+---
+
+# 1️⃣ Generate Embedding for Data
+
+## 📌 What is an Embedding?
+
+An embedding is a numerical vector representation of text.
+
+Example:
+"Hello world" → [0.0123, -0.9981, 0.3345, ...]
+
+Instead of matching words directly, we match meaning using vectors.
+
+---
+
+## 📌 Why Generate Embeddings for Data?
+
+We convert:
+- Documents
+- Notes
+- FAQs
+- Articles
+
+into vectors so we can later:
+- Compare similarity
+- Perform semantic search
+- Build RAG systems
+
+---
+
+## 📌 Embedding Flow
+
+Raw Text → Gemini Embedding Model → Vector → Store in DB / JSON
+
+---
+
+## 📌 Code Example
+
+```js
+const response = await ai.models.embedContent({
+  model: "gemini-embedding-001",
+  contents: texts.map(text => ({
+    role: "user",
+    parts: [{ text }]
+  }))
+});
+```
+
+---
+
+# 2️⃣ Generate Embedding for Question
+
+## 📌 Why?
+
+To compare a user’s query with stored document embeddings.
+
+If:
+Document embeddings = stored vectors
+Query embedding = new vector
+
+Then:
+We compare them using cosine similarity.
+
+---
+
+## 📌 Code Example
+
+```js
+const response = await ai.models.embedContent({
+  model: "gemini-embedding-001",
+  contents: [
+    {
+      role: "user",
+      parts: [{ text: query }]
+    }
+  ]
+});
+
+const queryEmbedding = response.embeddings[0].values;
+```
+
+---
+
+# 3️⃣ Display Match (Cosine Similarity)
+
+## 📌 What is Cosine Similarity?
+
+It measures angle between two vectors.
+
+Formula:
+
+cos(θ) = (A · B) / (|A| × |B|)
+
+Range:
+- 1 → Very similar
+- 0 → Unrelated
+- -1 → Opposite meaning
+
+---
+
+## 📌 Why Cosine?
+
+Because:
+- Embedding magnitude doesn't matter
+- Direction matters
+- Works well for high-dimensional vectors
+
+---
+
+## 📌 Manual Cosine Function
+
+```js
+export function cosineSimilarity(a, b) {
+  const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
+  const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
+  const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
+  return dot / (magA * magB);
+}
+```
+
+---
+
+## 📌 Matching Logic
+
+```js
+let bestMatch = null;
+let highestScore = -1;
+
+for (const item of storedData) {
+  const score = cosineSimilarity(queryEmbedding, item.embedding);
+
+  if (score > highestScore) {
+    highestScore = score;
+    bestMatch = item.text;
+  }
+}
+```
+
+---
+
+# 4️⃣ Interview Questions
+
+## 🧩 Basic Questions
+
+1. What is an embedding?
+2. Why do we use embeddings?
+3. What is vector dimensionality?
+4. Why cosine similarity over Euclidean distance?
+5. What is semantic search?
+
+---
+
+## 🧠 Intermediate Questions
+
+1. Difference between lexical search and semantic search?
+2. What is vector normalization?
+3. What is RAG?
+4. Why use vector databases?
+5. What happens if embedding dimensions mismatch?
+
+---
+
+## 🚀 Advanced Questions
+
+1. How do vector databases optimize search?
+2. What is Approximate Nearest Neighbor (ANN)?
+3. Why is high dimensionality useful?
+4. What is the curse of dimensionality?
+5. How would you scale semantic search for millions of records?
+
+---
+
+# 5️⃣ Code & Notes (Project Architecture)
+
+## 📁 Folder Structure
+
+```
+semantic-search/
+│
+├── index.js
+├── embedData.js
+├── similarity.js
+├── data.json
+├── embeddings.json
+├── .env
+├── package.json
+```
+
+---
+
+## 📌 Packages Required
+
+```bash
+npm install @google/genai dotenv
+```
+
+---
+
+## 📌 Environment File
+
+```
+GEMINI_API_KEY=your_key_here
+```
+
+---
+
+# 🔥 What You Built
+
+You built:
+
+✔ Embedding pipeline  
+✔ Vector storage system  
+✔ Semantic search engine  
+✔ Similarity ranking system  
+✔ Foundation of RAG  
+
+---
+
+# 🎯 Real-World Upgrade Path
+
+Level 1 → JSON storage  
+Level 2 → Express API  
+Level 3 → Vector DB (Pinecone, Weaviate)  
+Level 4 → Full RAG (Embedding + LLM generation)  
+Level 5 → Production-ready AI backend  
+
+---
+
+# 💡 Key Takeaways
+
+- Embeddings convert meaning into math
+- Cosine similarity measures semantic closeness
+- Vector databases scale semantic search
+- RAG = Retrieval + LLM generation
+- This is core backend AI engineering skill
+
+---
+
