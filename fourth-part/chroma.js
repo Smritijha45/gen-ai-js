@@ -1,13 +1,13 @@
-import {CloudClient} from "chromadb";
+import { CloudClient } from "chromadb";
 import dotenv from "dotenv";
 import { embedData } from "./embedData.js";
 
 dotenv.config();
 
 const client = new CloudClient({
-    apiKey: process.env.CHROMA_API_KEY,
-    tenant: process.env.CHROMA_TENANT,
-    database: process.env.CHROMA_DATABASE,
+  apiKey: process.env.CHROMA_API_KEY,
+  tenant: process.env.CHROMA_TENANT,
+  database: process.env.CHROMA_DATABASE,
 });
 
 // async function main() {
@@ -22,36 +22,44 @@ const client = new CloudClient({
 // }
 // main();
 async function main() {
-  const embedding = await embedData("dog");
+  const smritiData = await embedData([
+    "Smriti is a student of btech in computer science.",
+    "She is interested in learning about artificial intelligence.",
+    "she is 20 years old.",
+    "She has a pet dog.",
+  ]);
 
   const collection = await client.getOrCreateCollection({
-    name: "animals",
-    embeddingFunction: null
+    name: "usersData",
+    embeddingFunction: null,
   });
 
   await collection.add({
-    ids: ["3"],
-    documents: ["lion"],
-    embeddings: [embedding]
+    ids: ["1", "2", "3", "4"],
+    documents: [
+      "Smriti is a student of btech in computer science.",
+      "She is interested in learning about artificial intelligence.",
+      "she is 20 years old.",
+      "She has a pet dog.",
+    ],
+    embeddings: smritiData,
   });
-
-  
 }
 
 //main();
 async function findSimilarity() {
-  const animals = await client.getCollection({
-    name: "animals"
+  const usersData = await client.getCollection({
+    name: "usersData",
   });
 
-  const queryEmbedding = await embedData("get me animals");
+  const queryEmbedding = await embedData("what is her age?");
 
-//   console.log(queryEmbedding);        
-//   console.log(queryEmbedding.length); 
+  //   console.log(queryEmbedding);
+  //   console.log(queryEmbedding.length);
 
-  const results = await animals.query({
+  const results = await usersData.query({
     queryEmbeddings: [queryEmbedding],
-    nResults: 3,
+    nResults: 1,
   });
 
   console.log(results);

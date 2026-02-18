@@ -8,22 +8,32 @@ const ai = new GoogleGenAI({
 });
 
 /**
- * Generates embedding for a single text
- * @param {string} text
- * @returns {Promise<number[]>} embedding vector
+ * Generates embeddings
+ * Supports:
+ *  - Single string → returns single embedding vector
+ *  - Array of strings → returns array of embedding vectors
+ *
+ * @param {string | string[]} input
+ * @returns {Promise<number[] | number[][]>}
  */
-export async function embedData(text) {
+export async function embedData(input) {
+  const texts = Array.isArray(input) ? input : [input];
+
   const response = await ai.models.embedContent({
     model: "gemini-embedding-001",
-    contents: [
-      {
-        role: "user",
-        parts: [{ text }]
-      }
-    ]
+    contents: texts.map((text) => ({
+      role: "user",
+      parts: [{ text }],
+    })),
   });
 
-  const embedding = response.embeddings[0].values;
+  const embeddings = response.embeddings.map((e) => e.values);
 
-  return embedding;
+  // If original input was single string → return single vector
+  if (!Array.isArray(input)) {
+    return embeddings[0];
+  }
+
+  // If original input was array → return array of vectors
+  return embeddings;
 }
