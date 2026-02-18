@@ -651,3 +651,250 @@ Level 5 → Production-ready AI backend
 
 ---
 
+# 🧠 Vector Database & ChromaDB Notes
+
+---
+
+# 📌 What is a Vector Database?
+
+A Vector Database stores data in the form of **vectors (embeddings)** instead of traditional rows and columns.
+
+Traditional DB:
+- Stores text, numbers, relations
+
+Vector DB:
+- Stores high-dimensional numerical arrays
+- Enables semantic search
+
+---
+
+# 📌 Why Do We Need Vector Databases?
+
+When using AI:
+
+Text → Embedding Model → Vector  
+We need a place to store these vectors.
+
+Vector DB allows:
+- Semantic search
+- Similarity search
+- RAG systems
+- AI memory
+- Recommendation systems
+
+---
+
+# 📌 What is an Embedding?
+
+An embedding is a numerical representation of text.
+
+Example:
+"dog" → [0.12, -0.44, 0.98, ...]
+
+Instead of matching words,
+we compare meaning using vector similarity.
+
+---
+
+# 📌 What is ChromaDB?
+
+ChromaDB is an open-source vector database designed for AI applications.
+
+It is commonly used for:
+- RAG systems
+- Semantic search
+- LLM memory storage
+
+---
+
+# 📦 Installing ChromaDB (Node.js)
+
+```bash
+npm install chromadb
+```
+
+If using Chroma Cloud:
+
+```bash
+npm install chromadb
+```
+
+---
+
+# 📌 Creating a Chroma Client
+
+```js
+import { CloudClient } from "chromadb";
+
+const client = new CloudClient({
+  apiKey: process.env.CHROMA_API_KEY,
+  tenant: process.env.CHROMA_TENANT,
+  database: process.env.CHROMA_DATABASE,
+});
+```
+
+---
+
+# 📌 Creating a Collection
+
+A collection is like a table in SQL.
+
+```js
+const collection = await client.getOrCreateCollection({
+  name: "usersData",
+  embeddingFunction: null
+});
+```
+
+Note:
+If you generate embeddings externally (Gemini),
+set:
+
+```js
+embeddingFunction: null
+```
+
+---
+
+# 📌 Adding Data to Chroma
+
+Chroma expects arrays.
+
+```js
+await collection.add({
+  ids: ["1", "2"],
+  documents: [
+    "Smriti is a BTech student",
+    "She loves AI"
+  ],
+  embeddings: [
+    [0.12, 0.45, 0.89],
+    [0.77, 0.11, 0.34]
+  ]
+});
+```
+
+Important:
+- ids → array
+- documents → array
+- embeddings → 2D array
+- All lengths must match
+
+---
+
+# 📌 Querying Data
+
+```js
+const results = await collection.query({
+  queryEmbeddings: [queryEmbedding],
+  nResults: 3
+});
+
+console.log(results);
+```
+
+Chroma returns:
+- matching documents
+- similarity scores
+- ids
+
+---
+
+# 📌 Cosine Similarity Concept
+
+Vector DB internally uses similarity metrics like:
+
+- Cosine Similarity
+- Euclidean Distance
+- Dot Product
+
+Cosine Similarity Formula:
+
+cos(θ) = (A · B) / (|A| × |B|)
+
+Range:
+- 1 → Very similar
+- 0 → Unrelated
+- -1 → Opposite
+
+---
+
+# 📌 Chroma Architecture Flow
+
+User Query  
+↓  
+Generate Query Embedding (Gemini)  
+↓  
+Chroma Query (Nearest Vectors)  
+↓  
+Return Most Similar Documents  
+
+Optional:
+↓  
+Send retrieved documents to LLM (RAG)
+
+---
+
+# 📌 Chroma vs Traditional Database
+
+| Traditional DB | Vector DB |
+|---------------|------------|
+| Exact match search | Semantic similarity |
+| SQL queries | Vector similarity |
+| Structured data | Unstructured data |
+| Not AI-native | AI-native |
+
+---
+
+# 📌 Common Errors in Chroma
+
+1. Using `id` instead of `ids`
+2. Using `document` instead of `documents`
+3. Using `embedding` instead of `embeddings`
+4. Not matching array lengths
+5. Passing 3D embeddings instead of 2D
+
+---
+
+# 📌 Best Practices
+
+✔ Generate embeddings outside Chroma  
+✔ Store vectors directly  
+✔ Keep embedding dimensions consistent  
+✔ Do not push large vector files to GitHub  
+✔ Use vector DB for scalable search  
+
+---
+
+# 📌 What is RAG?
+
+RAG = Retrieval Augmented Generation
+
+Step 1 → Retrieve relevant documents from Chroma  
+Step 2 → Send them to LLM  
+Step 3 → Generate contextual answer  
+
+---
+
+# 📌 Real-World Use Cases
+
+- Chatbots with memory
+- AI-powered search engines
+- Resume screening
+- Legal document search
+- Knowledge base assistants
+
+---
+
+# 📌 Interview Questions
+
+1. What is a vector database?
+2. Why not use MongoDB for semantic search?
+3. What is cosine similarity?
+4. How does Chroma store embeddings?
+5. What happens if embedding dimensions mismatch?
+6. What is ANN (Approximate Nearest Neighbor)?
+7. How would you scale Chroma for millions of vectors?
+
+---
+

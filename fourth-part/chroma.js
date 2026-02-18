@@ -52,7 +52,7 @@ async function findSimilarity() {
     name: "usersData",
   });
 
-  const queryEmbedding = await embedData("what is her age?");
+  const queryEmbedding = await embedData("does she have a pet?");
 
   //   console.log(queryEmbedding);
   //   console.log(queryEmbedding.length);
