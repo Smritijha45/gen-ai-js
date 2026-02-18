@@ -30,13 +30,31 @@ async function main() {
   });
 
   await collection.add({
-    ids: ["1"],
-    documents: ["dog"],
+    ids: ["3"],
+    documents: ["lion"],
     embeddings: [embedding]
   });
 
   
 }
 
-main();
+//main();
+async function findSimilarity() {
+  const animals = await client.getCollection({
+    name: "animals"
+  });
 
+  const queryEmbedding = await embedData("get me animals");
+
+//   console.log(queryEmbedding);        
+//   console.log(queryEmbedding.length); 
+
+  const results = await animals.query({
+    queryEmbeddings: [queryEmbedding],
+    nResults: 3,
+  });
+
+  console.log(results);
+}
+
+findSimilarity();
