@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-
+import {ChatPromptTemplate} from "@langchain/core/prompts";
 dotenv.config();
 
 const model = new ChatGoogleGenerativeAI({
@@ -19,7 +19,26 @@ const model = new ChatGoogleGenerativeAI({
 // for(let i=0; i<response.length; i++){
 //   console.log(response[i].content);
 // } 
-const response = await model.stream("Explain closures in JavaScript in simple words.");
-for await (const part of response) {
-    console.log(part.content);
+// const response = await model.stream("Explain closures in JavaScript in simple words.");
+// for await (const part of response) {
+//     console.log(part.content);
+// }
+async function main() {
+    const prompt = ChatPromptTemplate.fromMessages([
+        {
+            role: "user",
+            content: "Explain closures in JavaScript in simple words."
+        }
+    ]);
+    const formattedPrompt = await prompt.format(
+        {
+            user: {
+                name: "smriti",
+                age: 20
+            }
+        }
+    );
+    const response = await model.invoke(formattedPrompt);
+    console.log(response.content);
 }
+main();
