@@ -23,21 +23,28 @@ const model = new ChatGoogleGenerativeAI({
 // for await (const part of response) {
 //     console.log(part.content);
 // }
+// async function main() {
+//     const prompt = ChatPromptTemplate.fromMessages([
+//         {
+//             role: "user",
+//             content: "Explain closures in JavaScript in simple words."
+//         }
+//     ]);
+//     const formattedPrompt = await prompt.format(
+//         {
+//             user: {
+//                 name: "smriti",
+//                 age: 20
+//             }
+//         }
+//     );
+//     const response = await model.invoke(formattedPrompt);
+//     console.log(response.content);
+// }
 async function main() {
-    const prompt = ChatPromptTemplate.fromMessages([
-        {
-            role: "user",
-            content: "Explain closures in JavaScript in simple words."
-        }
-    ]);
-    const formattedPrompt = await prompt.format(
-        {
-            user: {
-                name: "smriti",
-                age: 20
-            }
-        }
-    );
+    const prompt = ChatPromptTemplate.fromTemplate(
+        "What is the capital of {country}?")
+    const formattedPrompt = await prompt.format({ country: "canada" });
     const response = await model.invoke(formattedPrompt);
     console.log(response.content);
 }
