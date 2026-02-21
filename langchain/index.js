@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import {ChatPromptTemplate} from "@langchain/core/prompts";
+import {StringOutputParser} from "@langchain/core/output_parsers";
 dotenv.config();
 
 const model = new ChatGoogleGenerativeAI({
@@ -44,8 +45,9 @@ const model = new ChatGoogleGenerativeAI({
 async function main() {
     const prompt = ChatPromptTemplate.fromTemplate(
         "What is the capital of {country}?")
-    const formattedPrompt = await prompt.format({ country: "canada" });
-    const response = await model.invoke(formattedPrompt);
-    console.log(response.content);
+    // const formattedPrompt = await prompt.format({ country: "canada" });
+    // const response = await model.invoke(formattedPrompt);
+    const chain = prompt.pipe(model).pipe(new StringOutputParser());
+    console.log(await chain.invoke({ country: "canada" }));
 }
 main();
